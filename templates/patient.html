@@ -1,0 +1,56 @@
+<!--Page to add a user to database-->
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="Description" content="Form to add a new patient">
+        <title>Patient Database Table</title>
+    </head>
+
+    <body>
+
+        <!--Print out errors-->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!--Make sure user is signed in and with a sec level > 1-->
+        {% if session['loggedIn'] and session['secLevel'] > 1%}
+
+        <h2>Input the patient's information. Please do not leave any field blank</h2>
+        <form action="{{ url_for('transf') }}" method="POST">
+            <h3>Patient Information</h3>
+            Username<br>
+            <input type="text" name="Name"><br>
+
+            Age<br>
+            <input type="text" name="Age"><br>
+
+            Phone Number<br>
+            <input type="text" name="PhoneNumber"><br>
+
+            HasCovid<br>
+            <input type="checkbox" , name="HasCovid" , value="1"><br>
+
+            Security Role Level<br>
+            <input type="text" , name="SecurityLevel"><br>
+
+            Password<br>
+            <input type="password" name="Password"><br>
+            <input type="submit" value="submit"><br>
+        </form>
+
+        {% endif %}
+        <a href="/">Go back to home page</a>
+
+    </body>
+
+</html>

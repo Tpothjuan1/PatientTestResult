@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="User info page" content="Page to display user's information">
+        <title>User information</title>
+    </head>
+</html>
+
+<body>
+    <!--Make sure user is logged in-->
+    {% if session['loggedIn'] %}
+    <h1>Hospital App User Information</h1>
+    <b>Name:</b>
+    {{ sensitive["uName"]}}<br>
+    <b>Age:</b>
+    {{ row["UserAge"] }}<br>
+    <b>Phone Number:</b>
+    {{ sensitive["pNum"] }}<br>
+    <b>Has COVID:</b>
+    {{ row["UserHasCOVID"] }}<br>
+    <b>Security Role Level:</b>
+    {{ row["SecurityLevel"] }}<br>
+    <b>Login Password:</b>
+    {{ sensitive["pw"] }}<br>
+    {% endif %}
+    <h2>
+        <a href="/">Back to home page</a>
+    </h2>
+</body>

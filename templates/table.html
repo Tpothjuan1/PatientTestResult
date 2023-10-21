@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Patient Database Table</title>
+    </head>
+
+    <body>
+        <!--Print out erros-->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!--Make sure user is signed in and seclevel is > 2-->
+        {% if session['loggedIn'] and session['secLevel'] > 2 %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>Age</td>
+                    <td>Phone Number</td>
+                    <td>Has COVID</td>
+                    <td>Security Role Level</td>
+                    <td>Login Password</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row["UserName"] }}</td>
+                    <td>{{ row["UserAge"] }}</td>
+                    <td>
+                        {{ row["UserPhNum"] }}</td>
+                    <td>{{ row["UserHasCOVID"] }}</td>
+                    <td>{{ row["SecurityLevel"] }}</td>
+                    <td>{{ row["LoginPassword"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        <a href="/">Go back to home page</a>
+
+    </body>
+
+</html>

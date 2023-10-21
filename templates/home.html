@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+            <meta name="Description" content="Home interface for user and admins">
+                <title>Patient Database Portal</title>
+            </head>
+
+            <body>
+                <!--If they are logged in-->
+                {% if session['loggedIn'] %}
+                    <h1>Welcome to the Patient database page
+                        {{ name }}</h1>
+                    <h2></h2>
+
+                    <!--For everyone Show app user-->
+
+                    <h2>
+                        <a href="/showuser">Show Hospital App User</a>
+                    </h2>
+
+                    <!--for everyone show result tests-->
+
+                    <h2>
+                        <a href="/showresults">List Test Results</a>
+                    </h2>
+
+                    <!--Level 2 and 3 can add users-->
+                    {% if session['secLevel'] > 1 %}
+
+                        <h2>
+                            <a href="/addform">Add new Hospital App User</a>
+                        </h2>
+
+                    {% endif %}
+                    
+                    <!--Level 2 and 3 can add test results-->
+                    {% if session['secLevel'] > 1 %}
+
+                        <h2>
+                            <a href="/addformtest">Send a Test Result</a>
+                        </h2>
+
+                    {% endif %}
+
+                    <!--Level 3 can see the user database-->
+                    {% if session['secLevel'] > 2 %}
+
+                        <h2>
+                            <a href="/table">List Hospital App Users</a>
+                        </h2>
+
+                    {% endif %}
+
+
+                    <!--For everyone Show logout-->
+                    <h2>
+                        <a href="/logout">Logout</a>
+                    </h2>
+
+
+                    <!--If they NOT are logged in-->
+                {% else %}
+                    <h1>Unauthorized Access Denied</h1>
+
+                {% endif %}
+            </body>
+        </html>
+    </body>
+</html></body></html>

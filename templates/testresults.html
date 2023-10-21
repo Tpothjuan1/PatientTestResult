@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="Description"
+            content="Table that displays the test results of the user logged in">
+        <title>My Test Results</title>
+    </head>
+
+    <body>
+        <!--Print out erros-->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!--Make sure user is signed in and seclevel is > 0-->
+        {% if session['loggedIn'] and session['secLevel'] > 0 %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <td>Test Name</td>
+                    <td>Test Results</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row["TestName"] }}</td>
+                    <td>{{ row["TestResult"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        <a href="/">Go back to home page</a>
+
+    </body>
+
+</html>

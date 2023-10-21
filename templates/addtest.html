@@ -1,0 +1,48 @@
+<!--Page to add a test result to database-->
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="Description" content="Form to add new test results">
+        <title>Add a Test Result</title>
+    </head>
+
+    <body>
+
+        <!--Print out errors-->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!--Make sure user is signed in and with a sec level > 1-->
+        {% if session['loggedIn'] and session['secLevel'] > 1%}
+
+        <h1>Test Result Information</h1>
+
+        <form action="{{ url_for('addtest') }}" method="POST">
+            User Id<br>
+            <input type="text" name="userId"><br>
+
+            Test Name<br>
+            <input type="text" name="testName"><br>
+
+            Test Result<br>
+            <input type="text" name="testResult"><br>
+
+            <input type="submit" value="submit"><br>
+        </form>
+
+        {% endif %}
+        <a href="/">Go back to home page</a>
+
+    </body>
+
+</html>
