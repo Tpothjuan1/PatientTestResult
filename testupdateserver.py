@@ -50,8 +50,71 @@ class myHandler(socketserver.BaseRequestHandler):
             self.testid, self.result = self.rcvdPlaintxt.split(splitString)
 
             # input validation
-            self.validFlag = 1
-            if()
+            self.validFlag = True
+
+            if not (IsNumericBetween(self.testid)):
+                print("Test id is not an integer in the correct range")
+                self.validFlag = False
+
+            else:
+                # Make into integer
+                self.testid = int(self.testid)
+
+                try:
+                    # Connect to the DB
+                    self.connect = sql.connect("HospitalUsersCreateDB.db")
+                    # Get cursor to execute
+                    self.cur = self.connect.cursor()
+
+                    rows = self.cur.execute(
+                        """
+                        SELECT *
+                        FROM PatientTestResult
+                        WHERE TestResultId = ?;
+                        """,
+                        (self.testid,),
+                    ).fetchone()
+
+                    # no existing test id found
+                    if rows == None:
+                        print("Test ID couldn't be found")
+                        self.validFlag = False
+
+                except:
+                    print("Error fetching data")
+
+                finally:
+                    self.connect.close()
+
+            # Validating test result
+            if IsBlank(self.result):
+                print("Test result can't be empty")
+                self.validFlag = False
+
+            # post validation insert update
+
+            if self.validFlag:
+                try:
+                    # Connect to the DB
+                    self.connect = sql.connect("HospitalUsersCreateDB.db")
+                    # Get cursor to execute
+                    self.cur = self.connect.cursor()
+
+                    rows = self.cur.execute(
+                        """
+                        UPDATE PatientTestResult
+                        SET TestResult = ?
+                        WHERE TestResultId = ?;
+                        """,
+                        (self.result, self.testid),
+                    )
+
+                except:
+                    print("Error Updtating data")
+
+                finally:
+                    self.connect.close()
+
 
 # Server run
 if __name__ == "__main__":
