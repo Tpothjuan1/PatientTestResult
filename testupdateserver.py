@@ -18,7 +18,7 @@ import hmac, hashlib
 
 
 class myHandler(socketserver.BaseRequestHandler):
-    def myHandler(self):
+    def handle(self):
         # unsecure key
         authSecret = b"this not not safe at all"
         splitString = "^%@*"
@@ -26,16 +26,22 @@ class myHandler(socketserver.BaseRequestHandler):
         # Receive the data with strip to remove extra bytes
         self.data = self.request.recv(1024).strip()
 
+        # Print client's address
+        print("{}	sent message:	".format(self.client_address[0]))
+
         # Separate encrypted message form HMAC. HMAC is using SHA3-512
-        self.encryptedMsg = self.data[-64:]
-        self.hmacTag = self.data[:-64]
+        self.encryptedMsg = self.data[:-64]
+        self.hmacTag = self.data[-64:]
 
         # Need to unencrypt message first
         self.rcvdPlaintxt = Encryption.theCypher.Decrypt(self.encryptedMsg)
 
+        # Print received message
+        print("Message Received: {}".format(self.rcvdPlaintxt))
+
         # Authenticate message
         self.computedTag = hmac.new(
-            authSecret, self.rcvdPlaintxt, hashlib.sha3_512
+            authSecret, self.rcvdPlaintxt.encode("utf-8"), hashlib.sha3_512
         ).digest()
 
         # tags invalid signature
@@ -100,20 +106,26 @@ class myHandler(socketserver.BaseRequestHandler):
                     # Get cursor to execute
                     self.cur = self.connect.cursor()
 
-                    rows = self.cur.execute(
+                    self.cur.execute(
                         """
                         UPDATE PatientTestResult
                         SET TestResult = ?
                         WHERE TestResultId = ?;
                         """,
-                        (self.result, self.testid),
+                        (
+                            Encryption.theCypher.Encrypt(self.result.encode("utf-8")),
+                            self.testid,
+                        ),
                     )
+
+                    self.connect.commit()
+
+                    print("Results updated")
 
                 except:
                     print("Error Updtating data")
 
-                finally:
-                    self.connect.close()
+                self.connect.close()
 
 
 # Server run

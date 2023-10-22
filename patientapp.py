@@ -16,7 +16,7 @@ All work below was performed by Juan Sanchez
 from flask import Flask, render_template, request, session, flash, abort
 import sqlite3 as sql
 import os
-import Encryption
+import Encryption, hmac, hashlib
 import socket
 
 ############### HELPER FUNCTIONS  #######################
@@ -203,6 +203,16 @@ def addformtest():
         abort(404)
 
 
+# Update test result form
+@app.route("/showupdateform")
+def showupdateform():
+    # Show only if user security level is 2 or 3
+    if session.get("loggedIn") and session["secLevel"] > 0:
+        return render_template("updatetest.html")
+    else:
+        abort(404)
+
+
 ## Method to receive the user form and provide results
 @app.route("/transf", methods=["POST", "GET"])
 def transf():
@@ -344,13 +354,80 @@ def addtest():
                 ## Close the connection
                 sokt.close()
 
-                flash("Test Results Accepted")
+                flash("Test Result Update successfully sent")
 
             # Couldn't make the connection to the server
             except:
-                flash("The server couldn't be reached please try later")
+                flash("Error - Test Result Update  NOT sent ")
 
         return render_template("addtest.html")
+
+    ## Not logged in or not permissions
+    else:
+        abort(404)
+
+
+# Route to update test result
+@app.route("/updateresult", methods=["POST"])
+def updateresult():
+    # Separator string
+
+    sepstring = "^%@*"
+    secret = b"this not not safe at all"
+
+    # verify user is logged in with appropiate perms
+    if session.get("loggedIn") and session["secLevel"] > 0:
+        if request.method == "POST":
+            # Validate input
+
+            validationflag = True
+
+            testid = request.form["tid"]
+            testresult = request.form["tresult"]
+
+            if not (IsNumericBetween(testid)):
+                flash("Input is not an integer in the correct range")
+                validationflag = False
+            else:
+                # make into int
+                testid = int(testid)
+
+            if IsBlank(testresult):
+                flash("Test Result can't be blank")
+                validationflag = False
+
+            # Input is validd
+            if validationflag:
+                try:
+                    ## Server connection block
+                    HOST, PORT = "localhost", 8888
+                    sokt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sokt.connect((HOST, PORT))
+
+                    message = [str(testid), testresult]
+                    message = sepstring.join(message)
+
+                    tag = hmac.new(
+                        secret, message.encode("utf-8"), hashlib.sha3_512
+                    ).digest()
+
+                    ciphertxt = Encryption.theCypher.Encrypt(message.encode("utf-8"))
+
+                    totalmessage = ciphertxt + tag
+
+                    ## Send the ciphertext
+                    sokt.sendall(totalmessage)
+
+                    flash("Test Result Update successfully sent")
+
+                    ## Close the connection
+                    sokt.close()
+
+                # Couldn't make the connection to the server
+                except:
+                    flash("Error - Test Result Update  NOT sent ")
+
+        return render_template("updatetest.html")
 
     ## Not logged in or not permissions
     else:
